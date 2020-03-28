@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>WebSocket Wireless keyboard</title>
+		<script type="text/javascript">
+			var pr,socket,desktop=(navigator.platform=="Win32"||navigator.platform=="Win64")
+			function init(){
+				pr=document.getElementsByClassName("keyboard")[0]
+				for (var c of pr.children){
+					for (var k of c.children){
+						var f
+						if (k.innerHTML.length==1){
+							f=function(){
+								this.classList.add("down")
+								socket.send("key:"+this.innerHTML.toLowerCase())
+								var ths=this
+								setTimeout(function(){
+									ths.classList.remove("down")
+								},50)
+							}
+						}
+						else{
+							f=function(){
+								if (this.pressed==true){
+									this.pressed=false
+									socket.send("keyU:"+this.innerHTML.toLowerCase())
+									this.classList.remove("down")
+								}
+								else{
+									this.pressed=true
+									socket.send("keyD:"+this.innerHTML.toLowerCase())
+									this.classList.add("down")
+								}
+							}
+						}
+						if (desktop==false){
+							k.ontouchstart=f
+						}
+						else{
+							k.onclick=f
+						}
+					}
+				}
+				socket=new WebSocket("ws://192.168.178.56:8080/")
+				socket.onopen=function(){
+					console.log("Connected!")
+				}
+				socket.onclose=function(){
+					document.body.innerHTML="Disconnected :("
+				}
+				socket.onmessage=function(e){
+					if (e.data!="null"){
+						console.log(e.data)
+					}
+				}
+				socket.onerror=function(e){
+					console.warn(e)
+					e.stopImmediatePropagation()
+					e.stopPropagation()
+					e.preventDefault()
+				}
+			}
+			document.addEventListener("DOMContentLoaded",init)
+		</script>
+		<style type="text/css">
+			@import url('https://fonts.googleapis.com/css?family=Montserrat:700&display=swap');
+			html {
+				position: fixed;
+			}
+			body {
+				position: fixed;
+				margin: 0;
+				padding: 0;
+				width: 100%;
+				height: 100%;
+			}
+			body * {
+				margin: 0;
+				padding: 0;
+			}
+			.keyboard {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%,-50%);
+				width: 100%;
+			}
+			.keyboard .row {
+				position: relative;
+				height: 50px;
+				width: 100%;
+			}
+			.keyboard .row .key {
+				font-family: Montserrat;
+				font-size: 20px;
+				width: calc(100%/16);
+				height: 40px;
+				float: left;
+				border-radius: 15px;
+				border: solid  2px #dbdbdb;
+				margin-left: 2.5px;
+				margin-right: 2.5px;
+				margin-top: 2.5px;
+				text-align: center;
+				line-height: 40px;
+				user-select: none;
+			}
+			.keyboard .row .key.down {
+				background: #c9c9c9;
+			}
+			.keyboard .row .key.wide {
+				width: calc(100%/16*1.9);
+			}
+			.keyboard .row .key.wide.half-wide {
+				width: calc(100%/16*2.5);
+			}
+			.keyboard .row .key.half-wide {
+				width: calc(100%/16*1.75);
+			}
+		</style>
+		<meta name="viewport" content="width=device-width, user-scalable=no"/>
+	</head>
+	<body>
+		<div class="keyboard">
+			<div class="row">
+				<div class="key wide">Tab</div>
+				<div class="key">Q</div>
+				<div class="key">W</div>
+				<div class="key">E</div>
+				<div class="key">R</div>
+				<div class="key">T</div>
+				<div class="key">Y</div>
+				<div class="key">U</div>
+				<div class="key">I</div>
+				<div class="key">O</div>
+				<div class="key">P</div>
+				<div class="key wide">Delete</div>
+			</div>
+			<div class="row">
+				<div class="key half-wide wide">Shift</div>
+				<div class="key">A</div>
+				<div class="key">S</div>
+				<div class="key">D</div>
+				<div class="key">F</div>
+				<div class="key">G</div>
+				<div class="key">H</div>
+				<div class="key">J</div>
+				<div class="key">K</div>
+				<div class="key">L</div>
+				<div class="key half-wide wide">Backspace</div>
+			</div>
+			<div class="row">
+				<div class="key half-wide">Ctrl</div>
+				<div class="key half-wide">Alt</div>
+				<div class="key">Z</div>
+				<div class="key">X</div>
+				<div class="key">C</div>
+				<div class="key">V</div>
+				<div class="key">B</div>
+				<div class="key">N</div>
+				<div class="key">M</div>
+				<div class="key half-wide">Alt Gr</div>
+				<div class="key half-wide">Enter</div>
+			</div>
+		</div>
+	</body>
+</html>
