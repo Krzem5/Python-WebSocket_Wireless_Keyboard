@@ -1,1 +1,1 @@
-C:\Windows\explorer.exe /select,D:\K\Coding\projects\WebSocket-Wireless_Keyboard\data
+C:\Windows\explorer.exe /select,D\K\Coding\WebSocket-Wireless_Keyboard\data
